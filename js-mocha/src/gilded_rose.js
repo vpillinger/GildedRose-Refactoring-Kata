@@ -24,8 +24,8 @@ class Shop {
 
   changeQualityModifiers(item) {
     if (item.sellIn < 0) {
-      if (item.name != 'Aged Brie') {
-        if (item.name != 'Backstage passes to a TAFKAL80ETC concert') {
+      if (!this.isAgedBrie(item)) {
+        if (!this.isBackstagePass(item)) {
           this.reduceQuality(item);
         }
         else {
@@ -38,25 +38,42 @@ class Shop {
     }
   }
 
+  isBackstagePass(item) {
+    return item.name == 'Backstage passes to a TAFKAL80ETC concert'
+    || item.name == 'Conjured Backstage passes to a TAFKAL80ETC concert'
+  }
+  isAgedBrie(item) {
+    return item.name == 'Aged Brie'
+    || item.name == 'Conjured Aged Brie'
+  }
+
   reduceSellIn(item) {
     item.sellIn = item.sellIn - 1;
   }
 
   reduceQuality(item) {
-    item.quality = Math.max(0, item.quality - 1);
+    if(item.name.startsWith('Conjured')) {
+      item.quality = Math.max(0, item.quality - 2);
+    } else {
+      item.quality = Math.max(0, item.quality - 1);
+    }
   }
 
   increaseQuality(item) {
-    item.quality = Math.min(50, item.quality + 1);
+    if(item.name.startsWith('Conjured')) {
+      item.quality = Math.min(50, item.quality + 2);
+    } else {
+      item.quality = Math.min(50, item.quality + 1);
+    }
   }
 
   changeQuality(item) {
-    if (item.name != 'Aged Brie' && item.name != 'Backstage passes to a TAFKAL80ETC concert') {
+    if (!this.isAgedBrie(item) && !this.isBackstagePass(item)) {
         this.reduceQuality(item);
     }
     else {
       this.increaseQuality(item);
-      if (item.name == 'Backstage passes to a TAFKAL80ETC concert') {
+      if (this.isBackstagePass(item)) {
         if (item.sellIn < 11) {
           this.increaseQuality(item);
         }
