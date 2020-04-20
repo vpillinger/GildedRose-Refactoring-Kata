@@ -2,6 +2,11 @@ var {expect} = require('chai');
 var {Shop, Item} = require('../src/gilded_rose.js');
 describe("Gilded Rose", function() {
 
+  it("can create a shop with no items", function() {
+    const gildedRose = new Shop();
+    const items = gildedRose.updateQuality();
+  });
+
   it("Should reduce the quality by 1", function() {
     const gildedRose = new Shop([ new Item("foo", 0, 1) ]);
     const items = gildedRose.updateQuality();
@@ -57,9 +62,13 @@ describe("Gilded Rose", function() {
   });
 
   it("Should not change the sell by or quality of 'Sulfuras'", function() {
-    const gildedRose = new Shop([ new Item("Sulfuras, Hand of Ragnaros", 0, 80) ]);
+    const gildedRose = new Shop([
+      new Item("Sulfuras, Hand of Ragnaros", 0, 80),
+      new Item("Sulfuras, Hand of Ragnaros", -1, 80)
+    ]);
     const items = gildedRose.updateQuality();
     expect(items[0].quality).to.equal(80);
+    expect(items[1].quality).to.equal(80);
   });
 
   it("Increases the quality of 'Backstage passes' by 1 if sell by is more than 10", function() {
@@ -79,6 +88,19 @@ describe("Gilded Rose", function() {
     const items = gildedRose.updateQuality();
     expect(items[0].quality).to.equal(3);
   });
+
+  it("Does not increase the quality of 'Backstage passes' by more than 50", function() {
+    const gildedRose = new Shop([
+      new Item("Backstage passes to a TAFKAL80ETC concert", 11, 50),
+      new Item("Backstage passes to a TAFKAL80ETC concert", 10, 49),
+      new Item("Backstage passes to a TAFKAL80ETC concert", 5, 48)
+    ]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).to.equal(50);
+    expect(items[1].quality).to.equal(50);
+    expect(items[2].quality).to.equal(50);
+  });
+
 
   it("Reduces the quality of 'Backstage passes' to 0 after the concert", function() {
     const gildedRose = new Shop([ new Item("Backstage passes to a TAFKAL80ETC concert", 0, 50) ]);
